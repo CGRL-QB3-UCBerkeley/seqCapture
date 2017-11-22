@@ -1,0 +1,10 @@
+flash2
+*.txt
+*.fq
+*.fastq
+*.o
+*.swp
+*.histogram
+*.innie
+*.outie
+*.hist
