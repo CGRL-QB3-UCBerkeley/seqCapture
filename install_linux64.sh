@@ -4,7 +4,6 @@ echo "now installing dependencies for the sequence capture analysis workflow!"
 cd dependencies
 printf "\n"
 
-
 if ! (which conda 1> /dev/null 2>&1)
 then
    echo "miniconda2 is not installed! please run bash Miniconda2-latest-Linux-x86_64.sh to install!"
