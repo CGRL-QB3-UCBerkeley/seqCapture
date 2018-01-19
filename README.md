@@ -1,9 +1,10 @@
 # seqCapture
 Bioinformatic workflow for analyzing sequence capture NGS dataset
 
-Detailed documentaion please read here XXXX
+Detailed documentaion please read here XXXXX
 
 Install:
+
 1. To obtain the lastest version of seqCapture:
 
         $ git clone https://github.com/CGRL-QB3-UCBerkeley/seqCapture.git
