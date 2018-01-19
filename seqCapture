@@ -1,0 +1,212 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Cwd 'abs_path';
+use File::Basename;
+
+&main;
+exit;
+
+sub main {
+        &usage if (@ARGV<1);
+        my $command = shift(@ARGV);
+        my %TRANS = (
+                     popstats=>\&popstats, 
+                     generateoutfiles=>\&generateoutfiles, 
+                     align=>\&align,
+                     prealign=>\&prealign,
+                     mergealign=>\&mergealign,
+                     combine=>\&combine,
+                     cleanpe=>\&cleanpe, 
+                     cleanse=>\&cleanse, 
+                     assemble=>\&assemble, 
+                     intarget=>\&intarget, 
+                     buildcontigs=>\&buildcontigs,
+                     evaluation =>\&evaluation,
+                     map=>\&map,
+                     prefilter =>\&prefilter,
+                     snpcleaner=>\&snpcleaner
+                     );
+        die("Unknown command \"$command\"\n") if (!defined($TRANS{$command}));
+        &{$TRANS{$command}};
+        }
+
+sub usage {
+  die(qq/
+
+Description: A pipeline of analyzing sequence capture data
+(exome capture, UCEs, hyRad, AEH etc) for population genetic 
+and pylogenetic projects
+
+Author: 
+Ke Bi (kebi [at] berkeley.edu)
+
+Contributors:
+Sonal Singhal (sonal.singhal1 [at] gmail.com)
+Tyler Linderoth (tylerp.linderoth [at] gmail.com)
+
+[Version: 0.0.1]
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Usage: seqCapture <command> [<arguments>]\n
+
+Command:
+
+cleanpe:            clean paired-end raw Illimuna reads
+
+cleanse:            clean single-end raw Illimuna reads
+
+assemble:           de novo assemble captured sequence reads
+
+intarget:           compare assembled contigs from "assemble" against
+                    reference target sequences and identify assemblies
+                    dereived from target reference genome 
+
+buildcontigs:       align cleaned reads (from cleanpe) to intarget 
+                    assemblies (from intarget), call variants and then
+                    incorporate them into the contigs. Some filters are
+                    applied 
+
+prealign:           Subsetting datasets to prepare alignment in parallel 
+                    [optional]
+
+align:              generate multi-species alignment
+
+mergealign:         merge aligned results from seqCap align. Only applicable
+                    when seqCap prealign is first run: 
+                    (prealign -> align -> merge) [optional]
+
+combine:            combine alignments of coding and flanking regions 
+                    this function only makes sense when alignments for coding 
+                    and the flanking non-coding regions are performed 
+                    seperately but combining alignment of these two regions 
+                    is desired [optional]    
+
+generateoutfiles:   generate various output files for downstream analysis
+
+popstats:           perform basic population genetic analyses for phylogenetic
+                    datasets [optional]
+
+evaluation:         evaluate data quality of enrichment [optional but recommended] 
+
+map:                align cleaned reads to a reference genome
+
+prefilter:          generate coverage stats summaries to help determine 
+                    filtering thresholds for seqCap snpcleaner
+
+snpcleaner:         raw variant filtering; prepare keep file for ANGSD analysis
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+
+###################################################################################################                                     
+#   For phylogenetic applications (de novo assembly is required):                                 #  
+#   cleanpe -> assemble -> intarget -> buildcontigs -> prealign [optional] -> align ->            #
+#   mergealign [optional] -> combine [optional] -> evaluation [optional but recommended] ->       #
+#   generateoutfiles -> popstats [optional]                                                       #    
+#                                                                                                 #       
+#   For population genetics applications:                                                         #
+#   1. pre-existing reference genome is available                                                 #  
+#   cleanpe -> map -> evaluation [optional but recommended] -> prefilter -> snpcleaner            #
+#                                                                                                 #
+#   2. no reference; de novo assembly is required                                                 #
+#   cleanpe -> assemble -> intarget -> map -> evaluation [optional but recommended] ->            #
+#   prefilter -> snpcleaner                                                                       # 
+###################################################################################################     
+
+
+
+\n/);
+
+}
+
+sub cleanpe {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $cleanpe = $spath . "cleanpe.pl"; 
+system ("perl $cleanpe @ARGV ");
+}
+
+sub cleanse {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $cleanse = $spath . "cleanse.pl";
+system ("perl $cleanse @ARGV ");
+}
+sub assemble {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $assemble = $spath . "assemble.pl";
+system ("perl $assemble @ARGV ");
+}
+
+sub intarget {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $intarget = $spath . "intarget.pl";
+system ("perl $intarget @ARGV ");
+}
+
+sub buildcontigs {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $buildcontigs = $spath . "buildcontigs.pl";
+system ("perl $buildcontigs @ARGV ");
+}
+
+sub align {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $align = $spath . "align.pl";
+system ("perl $align @ARGV ");
+}
+
+sub generateoutfiles {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $out = $spath . "generateoutfiles.pl";
+system ("perl $out @ARGV ");
+}
+
+sub popstats {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $popstats = $spath . "popStats.pl";
+system ("perl $popstats @ARGV ");
+}
+
+sub prealign {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $prealign = $spath . "prealignment.pl";
+system ("perl $prealign @ARGV ");
+}
+
+sub mergealign {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $merge = $spath . "merge.pl";
+system ("perl $merge  @ARGV ");
+}
+
+
+sub combine {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $combine = $spath . "combined.pl";
+system ("perl $combine @ARGV ");
+}
+
+sub evaluation {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $eval = $spath . "evaluation.pl";
+system ("perl $eval @ARGV ");
+}
+
+sub map {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $map = $spath . "map.pl";
+system ("perl $map @ARGV ");
+}
+
+sub prefilter {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $prefilter = $spath . "prefilter.pl";
+system ("perl $prefilter @ARGV ");
+}
+
+sub snpcleaner {
+my $spath = $1 . '/scripts/'  if  (dirname(abs_path($0)) =~ /(\S+)/) or die "scripts path is incorrect!\n";
+my $snpcleaner = $spath . "snpcleaner.pl";
+system ("perl $snpcleaner @ARGV ");
+}
