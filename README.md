@@ -1,7 +1,7 @@
 # seqCapture
 Bioinformatic workflow for analyzing sequence capture NGS dataset
 
-Detailed documentaion please read here XXXXX
+Detailed documentaion please read the wiki (https://github.com/CGRL-QB3-UCBerkeley/seqCapture/wiki) of this workflow
 
 Install:
 
